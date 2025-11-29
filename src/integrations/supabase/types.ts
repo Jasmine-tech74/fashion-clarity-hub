@@ -14,7 +14,41 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      waitlist_signups: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          referral_code: string | null
+          referral_count: number | null
+          referred_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          referral_code?: string | null
+          referral_count?: number | null
+          referred_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          referral_code?: string | null
+          referral_count?: number | null
+          referred_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "waitlist_signups_referred_by_fkey"
+            columns: ["referred_by"]
+            isOneToOne: false
+            referencedRelation: "waitlist_signups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
