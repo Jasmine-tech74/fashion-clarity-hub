@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Mail } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 export const WaitlistForm = () => {
   const [email, setEmail] = useState("");
@@ -23,16 +24,38 @@ export const WaitlistForm = () => {
 
     setIsSubmitting(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    toast({
-      title: "Welcome to BOOM! 🎉",
-      description: "You're on the waitlist! Check your email for updates.",
-    });
-    
-    setEmail("");
-    setIsSubmitting(false);
+    try {
+      const { error } = await supabase
+        .from('waitlist_signups')
+        .insert([{ email: email.toLowerCase().trim() }]);
+
+      if (error) {
+        if (error.code === '23505') {
+          toast({
+            title: "Already on the list!",
+            description: "This email is already registered for the waitlist.",
+            variant: "destructive",
+          });
+        } else {
+          throw error;
+        }
+      } else {
+        toast({
+          title: "Welcome to BOOM! 🎉",
+          description: "You're on the waitlist! Check your email for updates.",
+        });
+        setEmail("");
+      }
+    } catch (error) {
+      console.error('Error signing up:', error);
+      toast({
+        title: "Something went wrong",
+        description: "Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
