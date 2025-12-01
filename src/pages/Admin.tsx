@@ -3,7 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Download, Mail, Users, TrendingUp } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Download, Mail, Users, TrendingUp, LogOut } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -24,11 +25,25 @@ interface WaitlistSignup {
 const Admin = () => {
   const [signups, setSignups] = useState<WaitlistSignup[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetchSignups();
+    checkAuth();
   }, []);
+
+  const checkAuth = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      navigate("/auth");
+      return;
+    }
+
+    setIsAuthenticated(true);
+    fetchSignups();
+  };
 
   const fetchSignups = async () => {
     try {
@@ -81,11 +96,20 @@ const Admin = () => {
     });
   };
 
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    navigate("/auth");
+  };
+
   const stats = {
     total: signups.length,
     withReferrals: signups.filter(s => s.referral_count > 0).length,
     totalReferrals: signups.reduce((sum, s) => sum + s.referral_count, 0),
   };
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-background p-6">
@@ -96,10 +120,16 @@ const Admin = () => {
             <h1 className="font-headline text-5xl text-primary">BOOM Waitlist Admin</h1>
             <p className="text-muted-foreground mt-2">Manage and export waitlist signups</p>
           </div>
-          <Button onClick={exportToCSV} size="lg" className="gap-2">
-            <Download className="h-5 w-5" />
-            Export to CSV
-          </Button>
+          <div className="flex gap-3">
+            <Button onClick={exportToCSV} size="lg" className="gap-2">
+              <Download className="h-5 w-5" />
+              Export to CSV
+            </Button>
+            <Button onClick={handleSignOut} size="lg" variant="outline" className="gap-2">
+              <LogOut className="h-5 w-5" />
+              Sign Out
+            </Button>
+          </div>
         </div>
 
         {/* Stats Cards */}
