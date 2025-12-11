@@ -2,12 +2,24 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Mail, User } from "lucide-react";
+import { Mail, User, ChevronDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-export const WaitlistForm = () => {
+interface WaitlistFormProps {
+  variant?: "default" | "compact";
+}
+
+export const WaitlistForm = ({ variant = "default" }: WaitlistFormProps) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [userType, setUserType] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
@@ -32,6 +44,15 @@ export const WaitlistForm = () => {
       return;
     }
 
+    if (!userType) {
+      toast({
+        title: "Please Select",
+        description: "Are you a tailor or a client?",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     
     try {
@@ -39,7 +60,8 @@ export const WaitlistForm = () => {
         .from('waitlist_signups')
         .insert([{ 
           name: name.trim(),
-          email: email.toLowerCase().trim() 
+          email: email.toLowerCase().trim(),
+          user_type: userType
         }]);
 
       if (error) {
@@ -54,11 +76,12 @@ export const WaitlistForm = () => {
         }
       } else {
         toast({
-          title: "Welcome to BOOM! 🎉",
+          title: "Welcome to BOOM!",
           description: "You're on the waitlist! Check your email for updates.",
         });
         setName("");
         setEmail("");
+        setUserType("");
       }
     } catch (error) {
       console.error('Error signing up:', error);
@@ -73,39 +96,49 @@ export const WaitlistForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-3 w-full max-w-md mx-auto">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full max-w-lg mx-auto">
       <div className="relative">
-        <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+        <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
         <Input
           type="text"
           placeholder="Your name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="pl-10 h-12 bg-background border-2 border-border focus:border-primary transition-colors"
+          className="pl-12 h-14 bg-background border-2 border-border focus:border-primary rounded-xl text-base transition-colors"
           disabled={isSubmitting}
         />
       </div>
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
-          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-          <Input
-            type="email"
-            placeholder="your.email@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="pl-10 h-12 bg-background border-2 border-border focus:border-primary transition-colors"
-            disabled={isSubmitting}
-          />
-        </div>
-        <Button 
-          type="submit" 
-          size="lg" 
+      
+      <div className="relative">
+        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+        <Input
+          type="email"
+          placeholder="your.email@example.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="pl-12 h-14 bg-background border-2 border-border focus:border-primary rounded-xl text-base transition-colors"
           disabled={isSubmitting}
-          className="h-12 px-8 font-semibold bg-primary hover:bg-primary-glow transition-all animate-glow-pulse"
-        >
-          {isSubmitting ? "Joining..." : "Join Waitlist"}
-        </Button>
+        />
       </div>
+
+      <Select value={userType} onValueChange={setUserType} disabled={isSubmitting}>
+        <SelectTrigger className="h-14 bg-background border-2 border-border focus:border-primary rounded-xl text-base">
+          <SelectValue placeholder="Are you a tailor or a client?" />
+        </SelectTrigger>
+        <SelectContent className="bg-background border-2 border-border rounded-xl z-50">
+          <SelectItem value="client" className="text-base py-3">I'm a Client</SelectItem>
+          <SelectItem value="tailor" className="text-base py-3">I'm a Tailor / Designer</SelectItem>
+        </SelectContent>
+      </Select>
+
+      <Button 
+        type="submit" 
+        size="lg" 
+        disabled={isSubmitting}
+        className="h-14 text-lg font-semibold bg-primary hover:bg-primary-glow rounded-xl transition-all shadow-lg hover:shadow-xl"
+      >
+        {isSubmitting ? "Joining..." : "Join the Waitlist"}
+      </Button>
     </form>
   );
 };
