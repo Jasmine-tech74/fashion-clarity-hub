@@ -123,11 +123,12 @@ export const WaitlistForm = ({ variant = "default" }: WaitlistFormProps) => {
 
       <Select value={userType} onValueChange={setUserType} disabled={isSubmitting}>
         <SelectTrigger className="h-14 bg-background border-2 border-border focus:border-primary rounded-xl text-base">
-          <SelectValue placeholder="Are you a tailor or a client?" />
+          <SelectValue placeholder="Select your role" />
         </SelectTrigger>
         <SelectContent className="bg-background border-2 border-border rounded-xl z-50">
-          <SelectItem value="client" className="text-base py-3">I'm a Client</SelectItem>
-          <SelectItem value="tailor" className="text-base py-3">I'm a Tailor / Designer</SelectItem>
+          <SelectItem value="client" className="text-base py-3">Client</SelectItem>
+          <SelectItem value="designer" className="text-base py-3">Designer</SelectItem>
+          <SelectItem value="tailor" className="text-base py-3">Tailor</SelectItem>
         </SelectContent>
       </Select>
 
