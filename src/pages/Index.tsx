@@ -230,6 +230,35 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Built for Nigeria Section */}
+      <section className="py-20 px-4 bg-gradient-to-br from-primary to-primary-glow overflow-hidden relative">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-10 left-10 w-40 h-40 border-2 border-primary-foreground rounded-full"></div>
+          <div className="absolute bottom-10 right-10 w-60 h-60 border-2 border-primary-foreground rounded-full"></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 border border-primary-foreground rounded-full"></div>
+        </div>
+        
+        <div className="container mx-auto max-w-4xl text-center space-y-8 relative z-10">
+          <h2 className="font-headline text-3xl sm:text-4xl md:text-5xl font-bold text-primary-foreground">
+            Built for Nigeria. Powered by AI.
+          </h2>
+          
+          <p className="text-lg sm:text-xl text-primary-foreground/90 max-w-3xl mx-auto leading-relaxed">
+            From Lagos to Abuja to Port Harcourt, we understand the struggle. BOOM is designed 
+            for the realities of Nigerian fashion — unreliable descriptions, last-minute rush, 
+            unclear measurements. We bring clarity, transparency, confidence, and better results 
+            for both clients and tailors.
+          </p>
+
+          <div className="py-8">
+            <div className="inline-flex items-center gap-3 bg-primary-foreground/10 backdrop-blur-sm px-8 py-5 rounded-full border border-primary-foreground/20">
+              <span className="text-3xl sm:text-4xl font-bold text-primary-foreground">2,000+</span>
+              <span className="text-primary-foreground/90 font-medium text-left">people have already<br className="sm:hidden" /> joined the waitlist</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Showcase / Demo Section */}
       <section id="showcase" className="py-20 px-4 bg-background">
         <div className="container mx-auto max-w-6xl space-y-12">
