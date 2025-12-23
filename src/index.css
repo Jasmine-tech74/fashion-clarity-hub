@@ -2,49 +2,49 @@
 @tailwind components;
 @tailwind utilities;
 
-/* BOOM Brand Design System - Blue #0057D9 primary, Light Blue #4DBBFF secondary */
+/* BOOM Brand Design System - Primary Blue #0A5CD5, Light Blue #4CC3FF, White #FFFFFF */
 
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 215 25% 15%;
+    --foreground: 215 25% 12%;
 
-    --card: 210 40% 98%;
-    --card-foreground: 215 25% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 215 25% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 15%;
+    --popover-foreground: 215 25% 12%;
 
-    /* Primary Blue #0057D9 = hsl(212, 100%, 43%) */
-    --primary: 212 100% 43%;
+    /* Primary Blue #0A5CD5 = hsl(214, 90%, 44%) */
+    --primary: 214 90% 44%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 212 100% 55%;
+    --primary-glow: 214 90% 52%;
 
-    /* Secondary Light Blue #4DBBFF = hsl(201, 100%, 65%) */
-    --secondary: 201 100% 65%;
-    --secondary-foreground: 215 25% 15%;
+    /* Secondary Light Blue #4CC3FF = hsl(198, 100%, 65%) */
+    --secondary: 198 100% 65%;
+    --secondary-foreground: 215 25% 12%;
 
     --muted: 210 40% 96%;
     --muted-foreground: 215 16% 47%;
 
-    /* Accent - slightly different blue for variety */
-    --accent: 201 100% 65%;
-    --accent-foreground: 215 25% 15%;
+    /* Accent - Light Blue for highlights */
+    --accent: 198 100% 65%;
+    --accent-foreground: 215 25% 12%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 214 32% 91%;
     --input: 214 32% 91%;
-    --ring: 212 100% 43%;
+    --ring: 214 90% 44%;
 
     --radius: 0.75rem;
 
-    --gradient-hero: linear-gradient(135deg, hsl(212 100% 43%), hsl(201 100% 65%));
+    --gradient-hero: linear-gradient(135deg, hsl(214 90% 44%), hsl(198 100% 65%));
     --gradient-subtle: linear-gradient(180deg, hsl(210 40% 98%), hsl(0 0% 100%));
-    --shadow-glow: 0 0 60px hsl(212 100% 43% / 0.2);
-    --shadow-card: 0 10px 40px hsl(215 25% 15% / 0.08);
-    --shadow-hover: 0 20px 60px hsl(212 100% 43% / 0.15);
+    --shadow-glow: 0 0 60px hsl(214 90% 44% / 0.2);
+    --shadow-card: 0 10px 40px hsl(215 25% 12% / 0.08);
+    --shadow-hover: 0 20px 60px hsl(214 90% 44% / 0.15);
 
     --sidebar-background: 210 40% 98%;
     --sidebar-foreground: 215 25% 27%;
@@ -66,17 +66,17 @@
     --popover: 215 25% 12%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 212 100% 55%;
+    --primary: 214 90% 52%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 201 100% 65%;
+    --primary-glow: 198 100% 65%;
 
-    --secondary: 201 100% 55%;
+    --secondary: 198 100% 55%;
     --secondary-foreground: 0 0% 100%;
 
     --muted: 215 25% 18%;
     --muted-foreground: 215 16% 60%;
 
-    --accent: 201 100% 55%;
+    --accent: 198 100% 55%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62% 30%;
@@ -84,21 +84,21 @@
 
     --border: 215 25% 20%;
     --input: 215 25% 20%;
-    --ring: 212 100% 55%;
+    --ring: 214 90% 52%;
     
-    --gradient-hero: linear-gradient(135deg, hsl(212 100% 55%), hsl(201 100% 65%));
+    --gradient-hero: linear-gradient(135deg, hsl(214 90% 52%), hsl(198 100% 65%));
     --gradient-subtle: linear-gradient(180deg, hsl(215 25% 8%), hsl(215 25% 12%));
-    --shadow-glow: 0 0 60px hsl(212 100% 55% / 0.3);
+    --shadow-glow: 0 0 60px hsl(214 90% 52% / 0.3);
     --shadow-card: 0 10px 40px hsl(0 0% 0% / 0.3);
 
     --sidebar-background: 215 25% 10%;
     --sidebar-foreground: 210 40% 96%;
-    --sidebar-primary: 212 100% 55%;
+    --sidebar-primary: 214 90% 52%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 215 25% 16%;
     --sidebar-accent-foreground: 210 40% 96%;
     --sidebar-border: 215 25% 16%;
-    --sidebar-ring: 212 100% 55%;
+    --sidebar-ring: 214 90% 52%;
   }
 }
 

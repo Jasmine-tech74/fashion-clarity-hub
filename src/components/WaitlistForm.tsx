@@ -138,7 +138,7 @@ export const WaitlistForm = ({ variant = "default" }: WaitlistFormProps) => {
         disabled={isSubmitting}
         className="h-14 text-lg font-semibold bg-primary hover:bg-primary-glow rounded-xl transition-all shadow-lg hover:shadow-xl"
       >
-        {isSubmitting ? "Joining..." : "Join the Waitlist"}
+        {isSubmitting ? "Joining..." : "Join the Beta Waitlist"}
       </Button>
     </form>
   );
