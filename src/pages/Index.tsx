@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { WaitlistForm } from "@/components/WaitlistForm";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -16,16 +17,24 @@ import {
   Instagram,
   Twitter,
   Facebook,
-  ArrowRight
+  ArrowRight,
+  Menu,
+  X,
+  Palette,
+  Wand2
 } from "lucide-react";
 
 const Index = () => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   const scrollToWaitlist = () => {
     document.getElementById('waitlist-section')?.scrollIntoView({ behavior: 'smooth' });
+    setMobileMenuOpen(false);
   };
 
   const scrollToSection = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    setMobileMenuOpen(false);
   };
 
   return (
@@ -42,14 +51,44 @@ const Index = () => {
             <button onClick={() => scrollToSection('hero')} className="text-foreground hover:text-primary transition-colors font-medium text-sm">Home</button>
             <button onClick={() => scrollToSection('problem')} className="text-muted-foreground hover:text-primary transition-colors font-medium text-sm">About</button>
             <button onClick={() => scrollToSection('how-it-works')} className="text-muted-foreground hover:text-primary transition-colors font-medium text-sm">How it Works</button>
-            <button onClick={() => scrollToSection('benefits-tailors')} className="text-muted-foreground hover:text-primary transition-colors font-medium text-sm">Benefits</button>
+            <button onClick={() => scrollToSection('design-studio')} className="text-muted-foreground hover:text-primary transition-colors font-medium text-sm">Design Studio</button>
             <button onClick={() => scrollToSection('waitlist-section')} className="text-muted-foreground hover:text-primary transition-colors font-medium text-sm">Contact</button>
           </div>
 
-          <Button onClick={scrollToWaitlist} size="sm" className="bg-primary hover:bg-primary-glow rounded-full px-5 text-sm">
-            Try Boom (Free Beta)
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button onClick={() => scrollToSection('design-studio')} size="sm" className="hidden sm:flex bg-primary hover:bg-primary-glow rounded-full px-5 text-sm">
+              <Wand2 className="w-4 h-4 mr-1" />
+              Try Design Generator
+            </Button>
+            
+            {/* Mobile Menu Toggle */}
+            <button 
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 rounded-lg hover:bg-muted transition-colors"
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-background border-t border-border animate-fade-in">
+            <div className="container mx-auto max-w-6xl px-4 py-4 flex flex-col gap-2">
+              <button onClick={() => scrollToSection('hero')} className="text-left py-3 px-4 rounded-lg text-foreground hover:bg-muted transition-colors font-medium">Home</button>
+              <button onClick={() => scrollToSection('problem')} className="text-left py-3 px-4 rounded-lg text-muted-foreground hover:bg-muted transition-colors font-medium">About</button>
+              <button onClick={() => scrollToSection('how-it-works')} className="text-left py-3 px-4 rounded-lg text-muted-foreground hover:bg-muted transition-colors font-medium">How it Works</button>
+              <button onClick={() => scrollToSection('design-studio')} className="text-left py-3 px-4 rounded-lg text-muted-foreground hover:bg-muted transition-colors font-medium">Design Studio</button>
+              <button onClick={() => scrollToSection('waitlist-section')} className="text-left py-3 px-4 rounded-lg text-muted-foreground hover:bg-muted transition-colors font-medium">Contact</button>
+              <div className="pt-2 border-t border-border mt-2">
+                <Button onClick={() => scrollToSection('design-studio')} className="w-full bg-primary hover:bg-primary-glow rounded-full">
+                  <Wand2 className="w-4 h-4 mr-2" />
+                  Try Design Generator
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* SECTION 1 — HERO */}
@@ -69,12 +108,12 @@ const Index = () => {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button 
-                onClick={scrollToWaitlist}
+                onClick={() => scrollToSection('design-studio')}
                 size="lg" 
                 className="h-12 px-8 text-base font-semibold bg-primary hover:bg-primary-glow rounded-full shadow-lg hover:shadow-xl transition-all"
               >
-                Try Boom (Free Beta)
-                <ArrowRight className="ml-2 h-4 w-4" />
+                <Wand2 className="w-5 h-5 mr-2" />
+                Try Design Generator
               </Button>
             </div>
             
@@ -182,6 +221,118 @@ const Index = () => {
               </p>
             </Card>
           </div>
+        </div>
+      </section>
+
+      {/* DESIGN STUDIO PREVIEW SECTION */}
+      <section id="design-studio" className="py-20 px-4 bg-gradient-to-br from-primary/5 via-background to-secondary/5 relative overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute top-10 left-10 w-32 h-32 bg-primary/10 rounded-full blur-2xl"></div>
+        <div className="absolute bottom-10 right-10 w-48 h-48 bg-secondary/20 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary/5 rounded-full blur-3xl"></div>
+        
+        <div className="container mx-auto max-w-5xl relative z-10">
+          <div className="text-center space-y-6 animate-fade-in mb-12">
+            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-semibold">
+              <Sparkles className="w-4 h-4" />
+              NEW: Design Studio Beta
+            </div>
+            <h2 className="font-headline text-3xl sm:text-4xl md:text-5xl font-bold text-foreground">
+              Your AI Fashion Design Studio
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Experience the power of AI-driven fashion visualization. Describe your dream outfit and watch it come to life in seconds.
+            </p>
+          </div>
+
+          {/* Premium Preview Card */}
+          <Card className="relative overflow-hidden border-2 border-primary/20 rounded-3xl shadow-2xl bg-background">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/5"></div>
+            
+            <div className="relative p-8 md:p-12">
+              <div className="grid md:grid-cols-2 gap-8 items-center">
+                {/* Left: Studio Preview */}
+                <div className="space-y-6">
+                  <div className="bg-muted/50 rounded-2xl p-6 border border-border">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-3 h-3 rounded-full bg-destructive"></div>
+                      <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                      <span className="ml-2 text-xs text-muted-foreground font-mono">design-studio.boom</span>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        <Palette className="w-5 h-5 text-primary" />
+                        <div className="h-8 bg-muted rounded-lg flex-1 flex items-center px-3">
+                          <span className="text-sm text-muted-foreground">Describe your outfit here...</span>
+                        </div>
+                      </div>
+                      
+                      <div className="aspect-video bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl flex items-center justify-center border border-primary/20">
+                        <div className="text-center space-y-3">
+                          <div className="w-16 h-16 mx-auto rounded-2xl bg-primary/20 flex items-center justify-center">
+                            <Wand2 className="w-8 h-8 text-primary" />
+                          </div>
+                          <p className="text-sm text-muted-foreground">AI Preview Appears Here</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right: Features & CTA */}
+                <div className="space-y-6">
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <Sparkles className="w-4 h-4 text-primary" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-foreground">AI-Powered Generation</h4>
+                        <p className="text-sm text-muted-foreground">State-of-the-art AI creates realistic outfit previews</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <Zap className="w-4 h-4 text-primary" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-foreground">Instant Results</h4>
+                        <p className="text-sm text-muted-foreground">See your design visualization in seconds</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <Eye className="w-4 h-4 text-primary" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-foreground">Multiple Angles</h4>
+                        <p className="text-sm text-muted-foreground">View your outfit from different perspectives</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-4">
+                    <Button 
+                      onClick={scrollToWaitlist}
+                      size="lg" 
+                      className="w-full h-14 text-lg font-bold bg-primary hover:bg-primary-glow rounded-2xl shadow-xl hover:shadow-2xl transition-all group"
+                    >
+                      <Wand2 className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" />
+                      Open Design Generator
+                      <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                    </Button>
+                    <p className="text-xs text-muted-foreground text-center mt-3">
+                      Free during beta • No credit card required
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Card>
         </div>
       </section>
 
