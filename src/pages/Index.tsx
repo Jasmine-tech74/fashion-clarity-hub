@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { WaitlistForm } from "@/components/WaitlistForm";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -316,15 +317,16 @@ const Index = () => {
                   </div>
 
                   <div className="pt-4">
-                    <Button 
-                      onClick={scrollToWaitlist}
-                      size="lg" 
-                      className="w-full h-14 text-lg font-bold bg-primary hover:bg-primary-glow rounded-2xl shadow-xl hover:shadow-2xl transition-all group"
-                    >
-                      <Wand2 className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" />
-                      Open Design Generator
-                      <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                    </Button>
+                    <Link to="/design-generator">
+                      <Button 
+                        size="lg" 
+                        className="w-full h-14 text-lg font-bold bg-primary hover:bg-primary-glow rounded-2xl shadow-xl hover:shadow-2xl transition-all group"
+                      >
+                        <Wand2 className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" />
+                        Open Design Generator
+                        <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                      </Button>
+                    </Link>
                     <p className="text-xs text-muted-foreground text-center mt-3">
                       Free during beta • No credit card required
                     </p>
