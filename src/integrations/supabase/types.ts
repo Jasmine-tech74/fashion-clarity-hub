@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      design_feedback: {
+        Row: {
+          additional_feedback: string | null
+          created_at: string
+          description: string | null
+          fabric_type: string | null
+          fit_style: string | null
+          gender: string | null
+          id: string
+          matched_mockup: string | null
+          matches_expectation: boolean | null
+          outfit_type: string | null
+        }
+        Insert: {
+          additional_feedback?: string | null
+          created_at?: string
+          description?: string | null
+          fabric_type?: string | null
+          fit_style?: string | null
+          gender?: string | null
+          id?: string
+          matched_mockup?: string | null
+          matches_expectation?: boolean | null
+          outfit_type?: string | null
+        }
+        Update: {
+          additional_feedback?: string | null
+          created_at?: string
+          description?: string | null
+          fabric_type?: string | null
+          fit_style?: string | null
+          gender?: string | null
+          id?: string
+          matched_mockup?: string | null
+          matches_expectation?: boolean | null
+          outfit_type?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string | null
