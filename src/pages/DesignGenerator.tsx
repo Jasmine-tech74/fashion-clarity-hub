@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
   SelectContent,
@@ -11,7 +12,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import boomLogo from "@/assets/boom-logo-new.jpg";
 import { 
   Wand2, 
@@ -20,14 +20,20 @@ import {
   ArrowLeft,
   Loader2,
   Download,
-  RefreshCw
+  MessageSquare,
+  Check,
+  X,
+  Info
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { findMatchingMockup, isDescriptionTooComplex, type MockupInput } from "@/lib/mockupMatcher";
 
 const DesignGenerator = () => {
   const { toast } = useToast();
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedImages, setGeneratedImages] = useState<string[]>([]);
+  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [mockupName, setMockupName] = useState<string>("");
+  const [showResult, setShowResult] = useState(false);
   
   // Form state
   const [gender, setGender] = useState("");
@@ -36,6 +42,11 @@ const DesignGenerator = () => {
   const [fitStyle, setFitStyle] = useState("");
   const [description, setDescription] = useState("");
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  
+  // Feedback state
+  const [feedbackMatch, setFeedbackMatch] = useState<string | null>(null);
+  const [feedbackText, setFeedbackText] = useState("");
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -58,40 +69,57 @@ const DesignGenerator = () => {
       return;
     }
 
+    // Check for overly complex descriptions
+    if (isDescriptionTooComplex(description)) {
+      toast({
+        title: "Design too complex",
+        description: "For best results, please describe a simple Nigerian outfit. Advanced designs are coming in later versions.",
+      });
+      return;
+    }
+
     setIsGenerating(true);
-    setGeneratedImages([]);
+    setShowResult(false);
+    setFeedbackSubmitted(false);
+    setFeedbackMatch(null);
+    setFeedbackText("");
+
+    // Simulate processing delay for user experience
+    await new Promise(resolve => setTimeout(resolve, 1500));
 
     try {
-      const { data, error } = await supabase.functions.invoke("generate-fashion-image", {
-        body: {
-          gender,
-          outfitType,
-          fabricType,
-          fitStyle,
-          description,
-        },
+      const input: MockupInput = {
+        gender,
+        outfitType,
+        fabricType,
+        fitStyle,
+        description,
+      };
+
+      const result = findMatchingMockup(input);
+      
+      setGeneratedImage(result.image);
+      setMockupName(result.name);
+      setShowResult(true);
+
+      toast({
+        title: "Preview ready!",
+        description: "Your design preview is ready for review.",
       });
 
-      if (error) throw error;
+      // Log the generation for internal analytics
+      console.log("[MVP Feedback Log] Generation:", {
+        timestamp: new Date().toISOString(),
+        inputs: { gender, outfitType, fabricType, fitStyle, description },
+        matchedMockup: result.name,
+        isExactMatch: result.isExactMatch,
+      });
 
-      if (data.error) {
-        throw new Error(data.error);
-      }
-
-      if (data.images && data.images.length > 0) {
-        setGeneratedImages(data.images.filter((img: string) => img));
-        toast({
-          title: "Design generated!",
-          description: "Your fashion visualization is ready.",
-        });
-      } else {
-        throw new Error("No images were generated. Please try again.");
-      }
     } catch (error: any) {
       console.error("Generation error:", error);
       toast({
-        title: "Generation failed",
-        description: error.message || "Something went wrong. Please try again.",
+        title: "Something went wrong",
+        description: "Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -99,13 +127,50 @@ const DesignGenerator = () => {
     }
   };
 
-  const handleDownload = (imageUrl: string, index: number) => {
+  const handleFeedbackSubmit = () => {
+    if (!feedbackMatch) {
+      toast({
+        title: "Please answer the question",
+        description: "Let us know if the preview matches what you had in mind.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Log feedback for internal analytics
+    console.log("[MVP Feedback Log] User Feedback:", {
+      timestamp: new Date().toISOString(),
+      inputs: { gender, outfitType, fabricType, fitStyle, description },
+      matchedMockup: mockupName,
+      feedback: {
+        matchesExpectation: feedbackMatch === "yes",
+        additionalFeedback: feedbackText,
+      },
+    });
+
+    setFeedbackSubmitted(true);
+    toast({
+      title: "Thank you for your feedback!",
+      description: "Your input helps us improve Boom for Nigerian tailors.",
+    });
+  };
+
+  const handleDownload = () => {
+    if (!generatedImage) return;
     const link = document.createElement("a");
-    link.href = imageUrl;
-    link.download = `boom-design-${index + 1}.png`;
+    link.href = generatedImage;
+    link.download = `boom-preview-${Date.now()}.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const handleStartOver = () => {
+    setShowResult(false);
+    setGeneratedImage(null);
+    setFeedbackMatch(null);
+    setFeedbackText("");
+    setFeedbackSubmitted(false);
   };
 
   return (
@@ -132,7 +197,7 @@ const DesignGenerator = () => {
         <div className="text-center space-y-4 mb-10">
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-semibold">
             <Sparkles className="w-4 h-4" />
-            AI-Powered Design Tool
+            Early Beta Preview
           </div>
           <h1 className="font-headline text-3xl sm:text-4xl md:text-5xl font-bold text-foreground">
             AI Fashion Design Generator
@@ -145,10 +210,18 @@ const DesignGenerator = () => {
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Input Form */}
           <Card className="p-6 md:p-8 border-2 border-border rounded-2xl">
-            <h2 className="font-headline text-xl font-bold text-foreground mb-6 flex items-center gap-2">
+            <h2 className="font-headline text-xl font-bold text-foreground mb-2 flex items-center gap-2">
               <Wand2 className="w-5 h-5 text-primary" />
               Describe Your Design
             </h2>
+            
+            {/* Guidance Text */}
+            <div className="flex items-start gap-2 mb-6 p-3 bg-accent/50 rounded-lg">
+              <Info className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+              <p className="text-sm text-muted-foreground">
+                For best results, describe a simple Nigerian outfit (e.g., native wear, senator, gown, suit).
+              </p>
+            </div>
 
             <div className="space-y-5">
               {/* Gender Select */}
@@ -178,11 +251,11 @@ const DesignGenerator = () => {
                     <SelectValue placeholder="Select outfit type" />
                   </SelectTrigger>
                   <SelectContent className="bg-background">
-                    <SelectItem value="native-wear">Native wear</SelectItem>
+                    <SelectItem value="native-wear">Native Wear</SelectItem>
+                    <SelectItem value="shirt-trousers">English Wear / Suit</SelectItem>
+                    <SelectItem value="wedding">Wedding Outfit</SelectItem>
+                    <SelectItem value="casual">Casual Wear</SelectItem>
                     <SelectItem value="gown">Gown</SelectItem>
-                    <SelectItem value="shirt-trousers">Shirt & Trousers</SelectItem>
-                    <SelectItem value="wedding">Wedding outfit</SelectItem>
-                    <SelectItem value="casual">Casual wear</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -200,8 +273,8 @@ const DesignGenerator = () => {
                     <SelectItem value="ankara">Ankara</SelectItem>
                     <SelectItem value="lace">Lace</SelectItem>
                     <SelectItem value="aso-oke">Aso-Oke</SelectItem>
-                    <SelectItem value="cotton">Plain cotton</SelectItem>
-                    <SelectItem value="senator">Senator material</SelectItem>
+                    <SelectItem value="cotton">Plain Cotton</SelectItem>
+                    <SelectItem value="senator">Senator Material</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -216,7 +289,8 @@ const DesignGenerator = () => {
                     <SelectValue placeholder="Select fit style" />
                   </SelectTrigger>
                   <SelectContent className="bg-background">
-                    <SelectItem value="fitted">Fitted</SelectItem>
+                    <SelectItem value="slim">Slim</SelectItem>
+                    <SelectItem value="regular">Regular</SelectItem>
                     <SelectItem value="loose">Loose</SelectItem>
                   </SelectContent>
                 </Select>
@@ -266,7 +340,7 @@ const DesignGenerator = () => {
                   id="description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="E.g., Royal blue agbada with gold embroidery on the collar..."
+                  placeholder="E.g., White senator with simple embroidery, agbada for groom..."
                   className="min-h-[100px] resize-none bg-background"
                 />
               </div>
@@ -281,7 +355,7 @@ const DesignGenerator = () => {
                 {isGenerating ? (
                   <>
                     <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                    Generating Design...
+                    Creating Preview...
                   </>
                 ) : (
                   <>
@@ -297,47 +371,108 @@ const DesignGenerator = () => {
           <Card className="p-6 md:p-8 border-2 border-border rounded-2xl">
             <h2 className="font-headline text-xl font-bold text-foreground mb-6 flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-primary" />
-              Generated Designs
+              Design Preview
             </h2>
 
-            {generatedImages.length > 0 ? (
-              <div className="space-y-4">
-                <div className="grid gap-4">
-                  {generatedImages.map((image, index) => (
-                    <div key={index} className="relative group">
-                      <img
-                        src={image}
-                        alt={`Generated design ${index + 1}`}
-                        className="w-full rounded-xl border border-border"
-                      />
-                      <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/10 transition-colors rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100">
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          onClick={() => handleDownload(image, index)}
-                          className="shadow-lg"
-                        >
-                          <Download className="w-4 h-4 mr-2" />
-                          Download
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
+            {showResult && generatedImage ? (
+              <div className="space-y-6">
+                {/* Generated Image */}
+                <div className="relative group">
+                  <img
+                    src={generatedImage}
+                    alt="Design preview"
+                    className="w-full rounded-xl border border-border"
+                  />
+                  <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/10 transition-colors rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100">
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={handleDownload}
+                      className="shadow-lg"
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Download
+                    </Button>
+                  </div>
                 </div>
 
+                {/* Labels */}
+                <div className="text-center space-y-2 p-4 bg-accent/30 rounded-xl">
+                  <p className="text-sm font-semibold text-foreground">
+                    AI-assisted preview (early beta simulation)
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    This preview is for testing clarity of communication between client and tailor.
+                  </p>
+                </div>
+
+                {/* Feedback Section */}
+                {!feedbackSubmitted ? (
+                  <div className="space-y-4 p-4 bg-muted/30 rounded-xl border border-border">
+                    <div className="flex items-center gap-2">
+                      <MessageSquare className="w-5 h-5 text-primary" />
+                      <h3 className="font-semibold text-foreground">Quick Feedback</h3>
+                    </div>
+
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium">
+                        Does this match what you had in mind?
+                      </Label>
+                      <RadioGroup value={feedbackMatch || ""} onValueChange={setFeedbackMatch} className="flex gap-4">
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="yes" id="feedback-yes" />
+                          <Label htmlFor="feedback-yes" className="flex items-center gap-1 cursor-pointer">
+                            <Check className="w-4 h-4 text-green-600" />
+                            Yes
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="no" id="feedback-no" />
+                          <Label htmlFor="feedback-no" className="flex items-center gap-1 cursor-pointer">
+                            <X className="w-4 h-4 text-red-500" />
+                            No
+                          </Label>
+                        </div>
+                      </RadioGroup>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="feedback-text" className="text-sm font-medium">
+                        What is missing or unclear? (optional)
+                      </Label>
+                      <Textarea
+                        id="feedback-text"
+                        value={feedbackText}
+                        onChange={(e) => setFeedbackText(e.target.value)}
+                        placeholder="Tell us what could be better..."
+                        className="min-h-[80px] resize-none bg-background"
+                      />
+                    </div>
+
+                    <Button onClick={handleFeedbackSubmit} className="w-full">
+                      Submit Feedback
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="p-4 bg-green-50 dark:bg-green-950/30 rounded-xl border border-green-200 dark:border-green-800 text-center">
+                    <Check className="w-8 h-8 mx-auto text-green-600 mb-2" />
+                    <p className="font-semibold text-green-800 dark:text-green-200">
+                      Thank you for your feedback!
+                    </p>
+                    <p className="text-sm text-green-700 dark:text-green-300">
+                      Your input helps us improve Boom.
+                    </p>
+                  </div>
+                )}
+
+                {/* Start Over Button */}
                 <Button
                   variant="outline"
-                  onClick={handleGenerate}
-                  disabled={isGenerating}
+                  onClick={handleStartOver}
                   className="w-full"
                 >
-                  <RefreshCw className="w-4 h-4 mr-2" />
-                  Generate New Variation
+                  Try Another Design
                 </Button>
-
-                <p className="text-xs text-muted-foreground text-center pt-2 border-t border-border">
-                  This is a visual reference to help communication between client and tailor.
-                </p>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center h-80 text-center space-y-4">
@@ -349,7 +484,7 @@ const DesignGenerator = () => {
                     No designs generated yet
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Fill in the form and click "Generate Design" to see your AI visualization
+                    Fill in the form and click "Generate Design" to see your preview
                   </p>
                 </div>
               </div>
@@ -361,7 +496,7 @@ const DesignGenerator = () => {
         <div className="mt-10 text-center">
           <Card className="inline-block px-6 py-4 bg-muted/30 border-0 rounded-xl">
             <p className="text-sm text-muted-foreground">
-              <span className="font-semibold text-foreground">Early Access Beta:</span> This is an early-stage visualization tool to help tailors and clients communicate better. Not for final garment production.
+              <span className="font-semibold text-foreground">Early Access Beta:</span> This is a visualization tool to help tailors and clients communicate better. We're actively improving based on your feedback.
             </p>
           </Card>
         </div>
