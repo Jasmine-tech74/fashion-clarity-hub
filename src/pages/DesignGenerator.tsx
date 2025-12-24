@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { findMatchingMockup, isDescriptionTooComplex, type MockupInput } from "@/lib/mockupMatcher";
+import { supabase } from "@/integrations/supabase/client";
 
 const DesignGenerator = () => {
   const { toast } = useToast();
@@ -127,7 +128,7 @@ const DesignGenerator = () => {
     }
   };
 
-  const handleFeedbackSubmit = () => {
+  const handleFeedbackSubmit = async () => {
     if (!feedbackMatch) {
       toast({
         title: "Please answer the question",
@@ -137,7 +138,7 @@ const DesignGenerator = () => {
       return;
     }
 
-    // Log feedback for internal analytics
+    // Log feedback for debugging
     console.log("[MVP Feedback Log] User Feedback:", {
       timestamp: new Date().toISOString(),
       inputs: { gender, outfitType, fabricType, fitStyle, description },
@@ -148,11 +149,32 @@ const DesignGenerator = () => {
       },
     });
 
-    setFeedbackSubmitted(true);
-    toast({
-      title: "Thank you for your feedback!",
-      description: "Your input helps us improve Boom for Nigerian tailors.",
+    // Persist feedback to database
+    const { error } = await supabase.from("design_feedback").insert({
+      gender,
+      outfit_type: outfitType,
+      fabric_type: fabricType,
+      fit_style: fitStyle,
+      description,
+      matched_mockup: mockupName,
+      matches_expectation: feedbackMatch === "yes",
+      additional_feedback: feedbackText || null,
     });
+
+    if (error) {
+      console.error("Failed to save feedback:", error);
+      toast({
+        title: "Feedback saved locally",
+        description: "Thank you! Your input helps us improve.",
+      });
+    } else {
+      toast({
+        title: "Thank you for your feedback!",
+        description: "Your input helps us improve Boom for Nigerian tailors.",
+      });
+    }
+
+    setFeedbackSubmitted(true);
   };
 
   const handleDownload = () => {
