@@ -1,1 +1,4 @@
 project_id = "oqrykuvngzgkvhymdvka"
+
+[functions.generate-fashion-image]
+verify_jwt = true
