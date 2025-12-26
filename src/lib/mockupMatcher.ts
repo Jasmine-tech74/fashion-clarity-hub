@@ -33,6 +33,21 @@ const containsKeyword = (text: string, keywords: string[]): boolean => {
   return keywords.some(keyword => normalized.includes(keyword.toLowerCase()));
 };
 
+// Map gender input to effective gender for matching (boys → men style, girls → women style)
+const getEffectiveGender = (gender: string): "men" | "women" => {
+  const normalized = normalizeText(gender);
+  if (normalized === "men" || normalized === "boys") return "men";
+  if (normalized === "women" || normalized === "girls") return "women";
+  // Default to women for any other value
+  return "women";
+};
+
+// Check if input is for kids
+const isKidsOutfit = (gender: string): boolean => {
+  const normalized = normalizeText(gender);
+  return normalized === "boys" || normalized === "girls" || normalized === "kids";
+};
+
 // Mockup rules ordered by specificity (evaluated in order)
 const mockupRules: MockupRule[] = [
   // MOCKUP 10 — Top only (check first as it's specific)
@@ -51,9 +66,9 @@ const mockupRules: MockupRule[] = [
     name: "Male Wedding Agbada",
     priority: 95,
     match: (input) => 
-      normalizeText(input.gender) === "men" && 
+      getEffectiveGender(input.gender) === "men" && 
       normalizeText(input.outfitType) === "wedding" ||
-      (normalizeText(input.gender) === "men" && containsKeyword(input.description, ["agbada", "groom", "traditional wedding"])),
+      (getEffectiveGender(input.gender) === "men" && containsKeyword(input.description, ["agbada", "groom", "traditional wedding"])),
   },
   
   // MOCKUP 09 — Female Wedding Bridal
@@ -63,9 +78,9 @@ const mockupRules: MockupRule[] = [
     name: "Female Wedding Bridal",
     priority: 95,
     match: (input) => 
-      normalizeText(input.gender) === "women" && 
+      getEffectiveGender(input.gender) === "women" && 
       normalizeText(input.outfitType) === "wedding" ||
-      (normalizeText(input.gender) === "women" && containsKeyword(input.description, ["bridal", "bride", "traditional wedding"])),
+      (getEffectiveGender(input.gender) === "women" && containsKeyword(input.description, ["bridal", "bride", "traditional wedding"])),
   },
   
   // MOCKUP 04 — Female Native Lace/Aso-Oke
@@ -75,10 +90,10 @@ const mockupRules: MockupRule[] = [
     name: "Female Native Lace/Aso-Oke",
     priority: 90,
     match: (input) => 
-      normalizeText(input.gender) === "women" && 
+      getEffectiveGender(input.gender) === "women" && 
       (normalizeText(input.outfitType) === "native-wear" || normalizeText(input.outfitType) === "wedding") &&
       (normalizeText(input.fabricType) === "lace" || normalizeText(input.fabricType) === "aso-oke") ||
-      (normalizeText(input.gender) === "women" && containsKeyword(input.description, ["traditional wedding", "engagement", "aso oke", "aso-oke"])),
+      (getEffectiveGender(input.gender) === "women" && containsKeyword(input.description, ["traditional wedding", "engagement", "aso oke", "aso-oke"])),
   },
   
   // MOCKUP 01 — Male Native Ankara
@@ -88,10 +103,10 @@ const mockupRules: MockupRule[] = [
     name: "Male Native Senator Ankara",
     priority: 85,
     match: (input) => 
-      normalizeText(input.gender) === "men" && 
+      getEffectiveGender(input.gender) === "men" && 
       normalizeText(input.outfitType) === "native-wear" &&
       normalizeText(input.fabricType) === "ankara" ||
-      (normalizeText(input.gender) === "men" && containsKeyword(input.description, ["senator", "native", "traditional", "ankara"])),
+      (getEffectiveGender(input.gender) === "men" && containsKeyword(input.description, ["senator", "native", "traditional", "ankara"])),
   },
   
   // MOCKUP 02 — Male Native Plain
@@ -101,10 +116,10 @@ const mockupRules: MockupRule[] = [
     name: "Male Native Senator Plain",
     priority: 80,
     match: (input) => 
-      normalizeText(input.gender) === "men" && 
+      getEffectiveGender(input.gender) === "men" && 
       normalizeText(input.outfitType) === "native-wear" &&
       (normalizeText(input.fabricType) === "cotton" || normalizeText(input.fabricType) === "senator") ||
-      (normalizeText(input.gender) === "men" && containsKeyword(input.description, ["simple", "clean", "classic", "plain", "white"])),
+      (getEffectiveGender(input.gender) === "men" && containsKeyword(input.description, ["simple", "clean", "classic", "plain", "white"])),
   },
   
   // MOCKUP 03 — Female Native Ankara Gown
@@ -114,10 +129,10 @@ const mockupRules: MockupRule[] = [
     name: "Female Native Ankara Gown",
     priority: 85,
     match: (input) => 
-      normalizeText(input.gender) === "women" && 
+      getEffectiveGender(input.gender) === "women" && 
       (normalizeText(input.outfitType) === "native-wear" || normalizeText(input.outfitType) === "gown") &&
       normalizeText(input.fabricType) === "ankara" ||
-      (normalizeText(input.gender) === "women" && containsKeyword(input.description, ["gown", "ankara", "long", "native"])),
+      (getEffectiveGender(input.gender) === "women" && containsKeyword(input.description, ["gown", "ankara", "long", "native"])),
   },
   
   // MOCKUP 05 — Male English Suit
@@ -127,9 +142,9 @@ const mockupRules: MockupRule[] = [
     name: "Male English Suit",
     priority: 85,
     match: (input) => 
-      normalizeText(input.gender) === "men" && 
+      getEffectiveGender(input.gender) === "men" && 
       normalizeText(input.outfitType) === "shirt-trousers" ||
-      (normalizeText(input.gender) === "men" && containsKeyword(input.description, ["suit", "formal", "corporate", "english", "office"])),
+      (getEffectiveGender(input.gender) === "men" && containsKeyword(input.description, ["suit", "formal", "corporate", "english", "office"])),
   },
   
   // MOCKUP 06 — Female English Dress
@@ -139,9 +154,9 @@ const mockupRules: MockupRule[] = [
     name: "Female English Dress",
     priority: 80,
     match: (input) => 
-      normalizeText(input.gender) === "women" && 
+      getEffectiveGender(input.gender) === "women" && 
       (normalizeText(input.outfitType) === "shirt-trousers" || normalizeText(input.outfitType) === "casual") ||
-      (normalizeText(input.gender) === "women" && containsKeyword(input.description, ["dress", "office", "corporate", "simple", "english"])),
+      (getEffectiveGender(input.gender) === "women" && containsKeyword(input.description, ["dress", "office", "corporate", "simple", "english"])),
   },
   
   // MOCKUP 07 — Casual Two-Piece (unisex)
@@ -160,7 +175,6 @@ const mockupRules: MockupRule[] = [
 const genderFallbacks: Record<string, string> = {
   men: mockup02, // Male native plain as default
   women: mockup03, // Female native ankara gown as default
-  kids: mockup07, // Casual two-piece for kids
 };
 
 export const findMatchingMockup = (input: MockupInput): { image: string; name: string; isExactMatch: boolean } => {
@@ -178,9 +192,9 @@ export const findMatchingMockup = (input: MockupInput): { image: string; name: s
     }
   }
   
-  // Fallback based on gender
-  const genderKey = normalizeText(input.gender);
-  const fallbackImage = genderFallbacks[genderKey] || mockup07;
+  // Fallback based on effective gender (boys → men style, girls → women style)
+  const effectiveGender = getEffectiveGender(input.gender);
+  const fallbackImage = genderFallbacks[effectiveGender] || mockup03;
   
   return {
     image: fallbackImage,
