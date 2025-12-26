@@ -251,14 +251,15 @@ const DesignGenerator = () => {
                 <Label htmlFor="gender" className="text-sm font-medium">
                   Who is this outfit for? <span className="text-destructive">*</span>
                 </Label>
-                <Select value={gender} onValueChange={setGender}>
+              <Select value={gender} onValueChange={setGender}>
                   <SelectTrigger id="gender" className="bg-background">
                     <SelectValue placeholder="Select gender" />
                   </SelectTrigger>
                   <SelectContent className="bg-background">
                     <SelectItem value="men">Men</SelectItem>
                     <SelectItem value="women">Women</SelectItem>
-                    <SelectItem value="kids">Kids</SelectItem>
+                    <SelectItem value="boys">Boys (Kids)</SelectItem>
+                    <SelectItem value="girls">Girls (Kids)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
